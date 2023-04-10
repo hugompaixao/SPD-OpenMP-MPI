@@ -2,24 +2,43 @@
 #include<string.h>
 #include<stdlib.h>
 #include<math.h>
+#include<omp.h>
 
 int abs_distance(int a, int b) {
     return abs(a-b);
 }
 
+
 void build_matrix(int *a, int m, int *b, int n, int **matrix) {
     matrix[0][0] = 0;
-    for (int i = 1; i < m; i++) 
-        matrix[0][i] = abs_distance(a[0], b[i]) + matrix[0][i-1];
-    for (int i = 1; i < n; i++)
-        matrix[i][0] = abs_distance(a[i], b[0]) + matrix[i-1][0];
+    #pragma omp parallel sections 
+    {
+        #pragma omp section
+        {
+            for (int i = 1; i < m; i++) 
+                matrix[0][i] = abs_distance(a[0], b[i]) + matrix[0][i-1];
+        }
+        
+        #pragma omp section
+        {
+            for (int i = 1; i < n; i++)
+                matrix[i][0] = abs_distance(a[i], b[0]) + matrix[i-1][0];
+        }
 
-    for (int i = 1; i < m; i++) {
-        for (int j = 1; j < n; j++) {
-            matrix[i][j] = abs_distance(a[i], b[j]) + fmin(matrix[i-1][j], fmin(matrix[i][j-1], matrix[i-1][j-1]));
+        #pragma omp section
+        {
+            #pragma omp parallel for shared(a, b, matrix) 
+            {   
+                for (int i = 1; i < m; i++) {
+                    for (int j = 1; j < n; j++) {
+                        matrix[i][j] = abs_distance(a[i], b[j]) + fmin(matrix[i-1][j], fmin(matrix[i][j-1], matrix[i-1][j-1]));
+                    }
+                }
+            }
         }
     }
 }
+
 
 int dtw(int **matrix, int m, int n, int *dtw) {
     int count = 0;
@@ -40,6 +59,7 @@ int dtw(int **matrix, int m, int n, int *dtw) {
     }
     return count;
 }
+
 
 int main() {
     FILE* input1;
