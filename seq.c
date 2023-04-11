@@ -3,6 +3,7 @@
 #include<stdlib.h>
 #include<math.h>
 
+
 int abs_distance(int a, int b) {
     return abs(a-b);
 }
@@ -41,7 +42,7 @@ int dtw(int **matrix, int m, int n, int *dtw) {
     return count;
 }
 
-int main() {
+int main(int argc, char *argv[]) {
     FILE* input1;
 	FILE* input2;
 

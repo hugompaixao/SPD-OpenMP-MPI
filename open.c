@@ -27,14 +27,12 @@ void build_matrix(int *a, int m, int *b, int n, int **matrix) {
 
         #pragma omp section
         {
-            #pragma omp parallel for shared(a, b, matrix) 
-            {   
+            #pragma omp parallel for shared(a, b, matrix)  
                 for (int i = 1; i < m; i++) {
                     for (int j = 1; j < n; j++) {
                         matrix[i][j] = abs_distance(a[i], b[j]) + fmin(matrix[i-1][j], fmin(matrix[i][j-1], matrix[i-1][j-1]));
                     }
                 }
-            }
         }
     }
 }
@@ -61,7 +59,7 @@ int dtw(int **matrix, int m, int n, int *dtw) {
 }
 
 
-int main() {
+int main(int argc, char *argv[]) {
     FILE* input1;
 	FILE* input2;
 
