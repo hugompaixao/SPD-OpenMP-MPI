@@ -12,6 +12,7 @@ void build_matrix(int *a, int m, int *b, int n, int **matrix) {
     matrix[0][0] = 0;
     for (int i = 1; i < m; i++) 
         matrix[0][i] = abs_distance(a[0], b[i]) + matrix[0][i-1];
+    
     for (int i = 1; i < n; i++)
         matrix[i][0] = abs_distance(a[i], b[0]) + matrix[i-1][0];
 
@@ -40,6 +41,23 @@ int dtw(int **matrix, int m, int n, int *dtw) {
         }
     }
     return count;
+}
+
+void print_array(int *arr, int length) {
+	for (int i = 0; i < length; i++) {
+		printf("%d\n", arr[i]);
+	}
+	printf("\n");
+}
+
+void print_matrix(int **matrix, int m, int n) {
+	for (int i = 0; i < m; i++) {
+		for (int j = 0; j < n; j++) {
+			printf("[%d] ", matrix[i][j]);
+		}
+		printf("\n");
+	}
+	printf("\n");
 }
 
 int main(int argc, char *argv[]) {
@@ -73,17 +91,9 @@ int main(int argc, char *argv[]) {
 
 	for (int i = 0; i < count2; i++)
 		fscanf(input2, "%d", &arr2[i]);
-
-	for (int i = 0; i < count1; i++)
-		printf("%d\n", arr1[i]);
 	
-	printf("\n");
-
-	for (int i = 0; i < count2; i++)
-		printf("%d\n", arr2[i]);
-
-	printf("\n");
-
+	print_array(arr1, count1);
+	print_array(arr2, count2);
 
 	fclose(input1);
 	fclose(input2);
@@ -102,22 +112,12 @@ int main(int argc, char *argv[]) {
 	free(arr1);
 	free(arr2);
 	
-	
-	for (int i = 0; i < count1; i++) {
-        for (int j = 0; j < count2; j++) {
-            printf("[%d]  ", matrix[i][j]);
-        }
-        printf("\n");
-    }
+	print_matrix(matrix, count1, count2);
 
     int path[count1*count2];
 
     int path_length = dtw(matrix, count1-1, count2-1, path);
-
-    for (int i = 0; i < path_length; i++)
-    {
-        printf("%d  ", path[i]);
-    }
+	print_array(path, path_length);
     free(path);
     return 0;
 }

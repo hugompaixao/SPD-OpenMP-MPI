@@ -4,10 +4,20 @@
 #include<math.h>
 #include<omp.h>
 
+
 int abs_distance(int a, int b) {
     return abs(a-b);
 }
 
+int min(int x, int y, int z) {
+	int min = x;
+    if (y < min) {
+        min = y;
+    }
+    if (z < min) {
+        min = z;
+    }
+    return min;
 
 void build_matrix(int *a, int m, int *b, int n, int **matrix) {
     matrix[0][0] = 0;
@@ -30,19 +40,18 @@ void build_matrix(int *a, int m, int *b, int n, int **matrix) {
             #pragma omp parallel for shared(a, b, matrix)  
                 for (int i = 1; i < m; i++) {
                     for (int j = 1; j < n; j++) {
-                        matrix[i][j] = abs_distance(a[i], b[j]) + fmin(matrix[i-1][j], fmin(matrix[i][j-1], matrix[i-1][j-1]));
+                        matrix[i][j] = abs_distance(a[i], b[j]) + min(matrix[i-1][j], matrix[i][j-1], matrix[i-1][j-1]);
                     }
                 }
         }
     }
 }
 
-
 int dtw(int **matrix, int m, int n, int *dtw) {
     int count = 0;
     dtw[count++] = matrix[m][n];
     while (m != 0 && n != 0) {
-        int min = fmin(matrix[n-1][m-1], fmin(matrix[n][m-1], matrix[n-1][m]));
+        int min = min(matrix[n-1][m-1], matrix[n][m-1], matrix[n-1][m]);
         if (min == matrix[n-1][m-1]) {
             dtw[count++] = min;
             n--;
@@ -58,6 +67,22 @@ int dtw(int **matrix, int m, int n, int *dtw) {
     return count;
 }
 
+void print_array(int *arr, int length) {
+	for (int i = 0; i < length; i++) {
+		printf("%d\n", arr[i]);
+	}
+	printf("\n");
+}
+
+void print_matrix(int **matrix, int m, int n) {
+	for (int i = 0; i < m; i++) {
+		for (int j = 0; j < n; j++) {
+			printf("[%d] ", matrix[i][j]);
+		}
+		printf("\n");
+	}
+	printf("\n");
+}
 
 int main(int argc, char *argv[]) {
     FILE* input1;
@@ -90,17 +115,9 @@ int main(int argc, char *argv[]) {
 
 	for (int i = 0; i < count2; i++)
 		fscanf(input2, "%d", &arr2[i]);
-
-	for (int i = 0; i < count1; i++)
-		printf("%d\n", arr1[i]);
 	
-	printf("\n");
-
-	for (int i = 0; i < count2; i++)
-		printf("%d\n", arr2[i]);
-
-	printf("\n");
-
+	print_array(arr1, count1);
+	print_array(arr2, count2);
 
 	fclose(input1);
 	fclose(input2);
@@ -119,22 +136,12 @@ int main(int argc, char *argv[]) {
 	free(arr1);
 	free(arr2);
 	
-	
-	for (int i = 0; i < count1; i++) {
-        for (int j = 0; j < count2; j++) {
-            printf("[%d]  ", matrix[i][j]);
-        }
-        printf("\n");
-    }
+	print_matrix(matrix, count1, count2);
 
     int path[count1*count2];
 
     int path_length = dtw(matrix, count1-1, count2-1, path);
-
-    for (int i = 0; i < path_length; i++)
-    {
-        printf("%d  ", path[i]);
-    }
+	print_array(path, path_length);
     free(path);
     return 0;
 }
